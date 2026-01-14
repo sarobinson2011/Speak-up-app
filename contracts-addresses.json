@@ -1,0 +1,7 @@
+{
+  "aurora-testnet": {
+    "VotingCredential": "0x8A086320D7320a7243c02A24D4ceA199EC45D65E",
+    "PetitionRegistry": "0x8D1908223856e3C38f46263dBAb6f0e38c5fab0f",
+    "explorerUrl": "https://explorer.testnet.aurora.dev"
+  }
+}

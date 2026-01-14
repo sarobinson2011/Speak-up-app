@@ -1,6 +1,7 @@
 {
   "name": "speak-up-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend API for Speak-up petition platform",
   "main": "src/index.ts",
   "scripts": {
@@ -16,6 +17,8 @@
     "dotenv": "^17.2.3",
     "ethers": "^6.16.0",
     "express": "^5.2.1",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.6.0",
     "openai": "^4.104.0"
   },
   "devDependencies": {

@@ -13,7 +13,7 @@ speak-up-app/
 │   │   └── PetitionRegistry.t.sol
 │   └── foundry.toml
 │
-├── frontend/               # Next.js app
+├── frontend/               # Vite app
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── PetitionCard.tsx
@@ -27,7 +27,7 @@ speak-up-app/
 │   ├── public/
 │   └── package.json
 │
-├── backend/                # Node.js API (AI moderation)
+├── backend/                # Node.js API (AI moderation) 
 │   ├── src/
 │   │   ├── index.ts
 │   │   ├── moderation.ts
@@ -43,6 +43,13 @@ speak-up-app/
 └── README.md
 ```
 
-## ...
+## Smart contract addresses - Aurora Testnet (verified)
+
+VotingCredential:
+0x8A086320D7320a7243c02A24D4ceA199EC45D65E
+
+PetitionRegistry: 
+0x8D1908223856e3C38f46263dBAb6f0e38c5fab0f
+
 
 
