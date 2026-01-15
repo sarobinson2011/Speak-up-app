@@ -1,33 +1,44 @@
-import { MerkleTree } from 'merkletreejs';
-import keccak256 from 'keccak256';
+import { buildPoseidon } from 'circomlibjs';
 
-// Mock KYC database - in production this would be a real database
-const verifiedUsers: string[] = [];
+const approvedHashes: string[] = [];
+let poseidon: any = null;
 
-export function addVerifiedUser(userID: string) {
-    if (!verifiedUsers.includes(userID)) {
-        verifiedUsers.push(userID);
-        console.log(`Added user ${userID} to merkle tree`);
+async function initPoseidon() {
+    if (!poseidon) {
+        poseidon = await buildPoseidon();
+    }
+    return poseidon;
+}
+
+function hashSecret(secret: string): string {
+    if (!poseidon) throw new Error('Poseidon not initialized');
+
+    // Convert secret to BigInt
+    const buf = Buffer.from(secret);
+    const bigInt = BigInt('0x' + buf.toString('hex'));
+
+    // Hash with Poseidon
+    const hash = poseidon.F.toString(poseidon([bigInt]));
+    return hash;
+}
+
+export async function addVerifiedUser(secret: string) {
+    await initPoseidon();
+
+    const hash = hashSecret(secret);
+
+    if (!approvedHashes.includes(hash)) {
+        approvedHashes.push(hash);
+        console.log(`Added approved hash: ${hash}`);
     }
 }
 
-export function getMerkleTree(): MerkleTree {
-    const leaves = verifiedUsers.map(id => keccak256(id));
-    return new MerkleTree(leaves, keccak256, { sortPairs: true });
+export function getApprovedHashes(): string[] {
+    return [...approvedHashes];
 }
 
-export function getMerkleRoot(): string {
-    const tree = getMerkleTree();
-    return tree.getHexRoot();
-}
-
-export function getMerkleProof(userID: string): string[] {
-    const tree = getMerkleTree();
-    const leaf = keccak256(userID);
-    const proof = tree.getHexProof(leaf);
-    return proof;
-}
-
-export function getVerifiedUsers(): string[] {
-    return [...verifiedUsers];
+export async function isApproved(secret: string): Promise<boolean> {
+    await initPoseidon();
+    const hash = hashSecret(secret);
+    return approvedHashes.includes(hash);
 }

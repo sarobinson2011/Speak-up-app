@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { ethers } from 'ethers';
 import { moderateComment } from './moderation.js';
+import { addVerifiedUser, getApprovedHashes, isApproved } from './merkle.js';
 
 dotenv.config();
 
@@ -42,6 +43,39 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Admin: Add approved credential
+app.post('/api/admin/add-credential', async (req, res) => {
+  const { secret } = req.body;
+
+  if (!secret) {
+    return res.status(400).json({ error: 'secret required' });
+  }
+
+  await addVerifiedUser(secret);
+
+  res.json({
+    success: true,
+    totalCredentials: getApprovedHashes().length
+  });
+});
+
+// Get all approved hashes (public)
+app.get('/api/approved-hashes', (req, res) => {
+  res.json({ hashes: getApprovedHashes() });
+});
+
+// Check if secret is approved
+app.post('/api/check-credential', async (req, res) => {
+  const { secret } = req.body;
+
+  if (!secret) {
+    return res.status(400).json({ error: 'secret required' });
+  }
+
+  const approved = await isApproved(secret);
+  res.json({ approved });
+});
+
 // Moderate and approve comment
 app.post('/api/moderate-comment', async (req, res) => {
   const { petitionId, commentIndex, content } = req.body;
@@ -54,7 +88,8 @@ app.post('/api/moderate-comment', async (req, res) => {
     console.log(`Moderating comment ${commentIndex} on petition ${petitionId}`);
 
     // AI moderation
-    const modResult = await moderateComment(content, process.env.OPENAI_API_KEY!); console.log('Moderation result:', modResult);
+    const modResult = await moderateComment(content, process.env.OPENAI_API_KEY!);
+    console.log('Moderation result:', modResult);
 
     if (modResult.approved && modResult.confidence >= 0.7) {
       // Auto-approve
